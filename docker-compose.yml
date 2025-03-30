@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    container_name: todo-list-postgres
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: on-failure
+  todo-backend:
+    build: ./backend  
+    image: todo-list-backend:latest
+    container_name: todo-list-backend
+    ports:
+      - '3000:3000'
+    env_file:
+    - ./backend/.env
+    depends_on:
+      - postgres
+  todo-web:
+    build: ./frontend  
+    image: todo-list-frontend:latest
+    container_name: todo-list-frontend
+    ports:
+      - '4173:4173'
+    env_file:
+    - ./frontend/.env
+    depends_on:
+      - todo-backend 
+    restart: on-failure
+
+volumes:
+  postgres-data: 
